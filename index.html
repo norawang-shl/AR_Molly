@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molly Variants Demo - AR Friendly</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f0f0;
+      text-align: center;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100vh;
+      background: #fff;
+      position: relative;
+    }
+
+    h2 {
+      position: absolute;
+      top: 16px;
+      width: 100%;
+      text-align: center;
+      z-index: 9999;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 桌機下拉選單固定底部 */
+    #variant-select-container {
+      display: none; /* 手機用 slot 內部，下拉選單桌機用 */
+    }
+
+    #variant-select {
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+    }
+
+    @media (min-width: 769px) {
+      #variant-select-container {
+        display: block;
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        background: rgba(255,255,255,0.9);
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Molly Variants Example</h2>
+
+  <model-viewer id="molly" 
+                src="molly.glb"
+                alt="Molly Model"
+                ar 
+                ar-modes="webxr scene-viewer quick-look"
+                camera-controls 
+                auto-rotate 
+                shadow-intensity="1">
+
+    <!-- AR 按鈕 -->
+    <button slot="ar-button"
+            style="background-color: white; border-radius: 4px; border: none; padding: 8px 12px; position: absolute; bottom: 16px; right: 16px;">
+      View in AR
+    </button>
+
+    <!-- 手機下拉選單放在 hotspot slot -->
+    <div slot="hotspot" style="position:absolute; bottom:80px; left:50%; transform:translateX(-50%); z-index:9999;">
+      <select id="variant-select-mobile">
+        <option value="">Default</option>
+      </select>
+    </div>
+
+  </model-viewer>
+
+  <!-- 桌機下拉選單 -->
+  <div id="variant-select-container">
+    <select id="variant-select-desktop">
+      <option value="">Default</option>
+    </select>
+  </div>
+
+  <script>
+    const molly = document.querySelector("#molly");
+    const selectMobile = document.getElementById("variant-select-mobile");
+    const selectDesktop = document.getElementById("variant-select-desktop");
+
+    molly.addEventListener("load", () => {
+      const variants = molly.availableVariants;
+      console.log("Variants available:", variants);
+
+      // 加入手機下拉選單
+      variants.forEach(v => {
+        const option = document.createElement("option");
+        option.value = v;
+        option.textContent = v;
+        selectMobile.appendChild(option);
+      });
+
+      // 加入桌機下拉選單
+      variants.forEach(v => {
+        const option = document.createElement("option");
+        option.value = v;
+        option.textContent = v;
+        selectDesktop.appendChild(option);
+      });
+
+      // 下拉選單切換 Variant
+      const changeVariant = (e) => {
+        molly.variantName = e.target.value || null;
+      };
+
+      selectMobile.addEventListener("change", changeVariant);
+      selectDesktop.addEventListener("change", changeVariant);
+    });
+  </script>
+
+</body>
+</html>
